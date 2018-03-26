@@ -10,7 +10,7 @@ import Vapor
 
 public final class FirebaseProvider: Provider {
     public static var repositoryName = "Firebase"
-    
+    public init() { }
     public func register(_ services: inout Services) throws {
         services.register(Firebase.self)
     }

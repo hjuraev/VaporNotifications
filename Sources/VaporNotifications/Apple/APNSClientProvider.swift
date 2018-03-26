@@ -10,7 +10,7 @@ import Vapor
 
 public final class APNSClientProvider: Provider {
     public static var repositoryName = "APNS"
-    
+    public init() { }
     public func register(_ services: inout Services) throws {
         services.register(APNSClient.self)
     }
