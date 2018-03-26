@@ -7,7 +7,7 @@
 
 import Foundation
 
-open class APNSPayload: Codable {
+public class APNSPayload: Codable {
     
     public var badge: Int?
     

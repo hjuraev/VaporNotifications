@@ -15,7 +15,7 @@ import Bits
 import NIO
 import Vapor
 
-struct FirebaseProfile {
+public struct FirebaseProfile {
 
     var serverKey: String
     
@@ -23,7 +23,7 @@ struct FirebaseProfile {
         self.serverKey = serverKey
     }
     
-    func getRequest<T: Codable>(message: FirebaseMessage<T>, container: Container) throws -> Request {
+    public func getRequest<T: Codable>(message: FirebaseMessage<T>, container: Container) throws -> Request {
         let request = Request(using: container)
         for header in getHeaders() {
             request.http.headers.add(name: header.name, value: header.value)
@@ -36,14 +36,15 @@ struct FirebaseProfile {
         return request
     }
     
-    struct GoogleJWTPayload: JWTPayload {
+    public struct GoogleJWTPayload: JWTPayload {
         let aud: String?
         let iss: String?
         let sub: String?
         let uid: String = UUID().uuidString
         let iat:Int = Int(Date().timeIntervalSince1970.rounded())
         let exp:Int = Int(Date().timeIntervalSince1970.rounded() + 360)
-        func verify() throws {
+        
+        public func verify() throws {
         }
     }
     

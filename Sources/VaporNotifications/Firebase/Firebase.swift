@@ -8,17 +8,21 @@
 import Foundation
 import Vapor
 
-class Firebase: Service {
+public final class Firebase: ServiceType {
     
-    var client: FoundationClient
-    var worker: Container
+    public static func makeService(for worker: Container) throws -> Firebase {
+        return try Firebase(worker: worker)
+    }
     
-    init(worker: Container) throws{
+    public var client: FoundationClient
+    public var worker: Container
+    
+    public init(worker: Container) throws{
         self.worker = worker
         self.client = try FoundationClient.makeService(for: worker)
     }
     
-    func send<T: Codable>(message: FirebaseMessage<T>, profile: FirebaseProfile) throws -> Future<FirebaseMessageResult>{
+    public func send<T: Codable>(message: FirebaseMessage<T>, profile: FirebaseProfile) throws -> Future<FirebaseMessageResult>{
         let request = try profile.getRequest(message: message, container: worker)
         let response = try client.respond(to: request)
         

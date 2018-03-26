@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FirebaseMessage<T: Codable>: Codable{
+public struct FirebaseMessage<T: Codable>: Codable{
 
     public var to: String
     public var collapse_key: String?
@@ -17,13 +17,13 @@ struct FirebaseMessage<T: Codable>: Codable{
     
     public var Payload: FirebaseMessagePayload?
 
-    enum Priority: String, Codable {
+    public enum Priority: String, Codable {
         case high = "high"
         case normal = "normal"
     }
 }
 
-struct FirebaseMessagePayload: Codable {
+public struct FirebaseMessagePayload: Codable {
     
     public var badge: Int?
 

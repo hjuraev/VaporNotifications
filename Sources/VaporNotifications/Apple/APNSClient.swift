@@ -7,16 +7,21 @@
 
 import Vapor
 
-class APNSClient: Service {
+public final class APNSClient: ServiceType {
+    
+    public static func makeService(for worker: Container) throws -> APNSClient {
+        return try APNSClient(worker: worker)
+    }
+    
     var client: FoundationClient
     var worker: Container
     
-    init(worker: Container) throws{
+    public init(worker: Container) throws{
         self.worker = worker
         self.client = try FoundationClient.makeService(for: worker)
     }
     
-    func send(message: ApplePushMessage) throws -> Future<APNSResult>{
+    public func send(message: ApplePushMessage) throws -> Future<APNSResult>{
         let response = try client.respond(to: message.getRequest(container: worker))
         return response.map { response -> (APNSResult) in
             guard let body = response.http.body.data, body.count != 0 else {
