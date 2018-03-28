@@ -23,16 +23,22 @@ public struct FirebaseProfile {
         self.serverKey = serverKey
     }
     
-    public func getRequest<T: Codable>(message: FirebaseMessage<T>, container: Container) throws -> Request {
+    public func getRequest(message: FirebaseMessage, container: Container) throws -> Request {
         let request = Request(using: container)
         for header in getHeaders() {
             request.http.headers.add(name: header.name, value: header.value)
         }
         request.http.method = .POST
         request.http.url = hostURL()
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(message)
-        request.http.body = HTTPBody(data: data)
+        let jsonEncoder = JSONEncoder()
+        let data = try jsonEncoder.encode(message)
+        var messageJson = try JSON(data: data)
+        if let messageData = message.data {
+            let json = try JSON(data: messageData)
+            messageJson["data"] = json
+        }
+        let newData = try messageJson.rawData()
+        request.http.body = HTTPBody(data: newData)
         return request
     }
     

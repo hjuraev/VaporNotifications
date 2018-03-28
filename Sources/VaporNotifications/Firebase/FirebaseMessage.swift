@@ -7,13 +7,13 @@
 
 import Foundation
 
-public struct FirebaseMessage<T: Codable>: Codable{
+public struct FirebaseMessage: Codable{
 
     public var to: String
     public var collapse_key: String?
     public var priority: Priority
     public var time_to_live: Date?
-    public var data: T
+    public var data: Data?
     
     public var Payload: FirebaseMessagePayload?
 

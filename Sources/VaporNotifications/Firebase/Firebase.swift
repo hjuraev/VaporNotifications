@@ -22,7 +22,7 @@ public final class Firebase: ServiceType {
         self.client = try FoundationClient.makeService(for: worker)
     }
     
-    public func send<T: Codable>(message: FirebaseMessage<T>, profile: FirebaseProfile) throws -> Future<FirebaseMessageResult>{
+    public func send(message: FirebaseMessage, profile: FirebaseProfile) throws -> Future<FirebaseMessageResult>{
         let request = try profile.getRequest(message: message, container: worker)
         let response = try client.respond(to: request)
         
