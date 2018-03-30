@@ -54,7 +54,11 @@ public struct ApplePushMessage {
         if let threadId = threadIdentifier {
             headers.add(name: HTTPHeaderName("thread-id"), value: threadId)
         }
-        headers.add(name: HTTPHeaderName("authorization"), value: "bearer \(profile.Token)")
+        if profile.tokenExpiration <= Date() {
+            try? profile.generateToken()
+        }
+        
+        headers.add(name: HTTPHeaderName("authorization"), value: "bearer \(profile.Token ?? "")")
         return headers
     }
     
@@ -98,7 +102,7 @@ public struct ApplePushMessage {
 struct APNSJWTPayload: JWTPayload {
     let iss: String
     let iat = IssuedAtClaim(value: Date())
-    let exp = ExpirationClaim(value: Date(timeInterval: 10000, since: Date()))
+    let exp = ExpirationClaim(value: Date(timeInterval: 3500, since: Date()))
     func verify() throws {
     }
 }

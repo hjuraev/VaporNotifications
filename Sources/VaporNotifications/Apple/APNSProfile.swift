@@ -8,7 +8,7 @@
 import Foundation
 import JWT
 
-public struct APNSProfile {
+public class APNSProfile {
     public enum Port: Int {
         case p443 = 443, p2197 = 2197
     }
@@ -17,8 +17,8 @@ public struct APNSProfile {
     public var port: Port = .p443
     public var teamId: String
     public var keyId: String
-    public let Token: String
-    
+    public var Token: String?
+    public var tokenExpiration: Date = Date()
     var privateKey: Data
     var publicKey: Data
     
@@ -53,9 +53,12 @@ public struct APNSProfile {
         let (priv, pub) = KeyUtilities.generateKeys(Path: keyPath)
         self.publicKey = pub
         self.privateKey = priv
+        try generateToken()
+    }
+    
+    func generateToken() throws {
         let JWTheaders = JWTHeader(alg: "ES256", cty: nil, crit: nil, kid: keyId)
         let payload = APNSJWTPayload(iss: teamId)
-        
         
         let signer = JWTSigner.es256(key: privateKey)
         
@@ -66,6 +69,7 @@ public struct APNSProfile {
         guard let token = stringToken else {
             throw TokenError.tokenWasNotGeneratedCorrectly
         }
+        tokenExpiration = Date(timeInterval: 3500, since: Date())
         self.Token = token
     }
 

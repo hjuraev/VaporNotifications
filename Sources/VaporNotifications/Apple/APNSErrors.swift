@@ -8,7 +8,7 @@
 import Foundation
 
 public struct APNSError: Codable {
-    let reason: APNSErrors
+    public let reason: APNSErrors
 }
 public enum APNSErrors: String, Codable {
     case BadCollapseId = "BadCollapseId"
