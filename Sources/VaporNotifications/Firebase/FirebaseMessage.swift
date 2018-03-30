@@ -21,6 +21,14 @@ public struct FirebaseMessage: Codable{
         case high = "high"
         case normal = "normal"
     }
+    public init(to: String, collapse_key: String? = nil, priority:Priority = .high, time_to_live: Date? = nil, data: Data? = nil, payload: FirebaseMessagePayload? = nil ) {
+        self.to = to
+        self.collapse_key = collapse_key
+        self.priority = priority
+        self.time_to_live = time_to_live
+        self.data = data
+        self.Payload = payload
+    }
 }
 
 public struct FirebaseMessagePayload: Codable {
