@@ -25,6 +25,9 @@ public final class APNSClient: ServiceType {
         let response = try client.respond(to: message.getRequest(container: worker))
         return response.map { response -> (APNSResult) in
             debugPrint(response)
+            if let data = response.http.body.data {
+                debugPrint(String(data: data, encoding: .utf8))
+            }
             guard let body = response.http.body.data, body.count != 0 else {
                 return APNSResult.success(apnsId: message.messageId, deviceToken: message.deviceToken)
             }
