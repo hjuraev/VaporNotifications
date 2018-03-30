@@ -40,6 +40,10 @@ public final class APNSClient: ServiceType {
             }
         }
     }
+    public func sendRaw(message: ApplePushMessage) throws -> Future<Response> {
+        return try client.respond(to: message.getRequest(container: worker))
+    }
+    
 }
 
 
