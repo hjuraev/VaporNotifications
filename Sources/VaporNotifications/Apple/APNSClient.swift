@@ -24,6 +24,7 @@ public final class APNSClient: ServiceType {
     public func send(message: ApplePushMessage) throws -> Future<APNSResult>{
         let response = try client.respond(to: message.getRequest(container: worker))
         return response.map { response -> (APNSResult) in
+            debugPrint(response.http)
             guard let body = response.http.body.data, body.count != 0 else {
                 return APNSResult.success(apnsId: message.messageId, deviceToken: message.deviceToken)
             }
