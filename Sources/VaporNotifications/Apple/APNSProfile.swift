@@ -57,6 +57,7 @@ public class APNSProfile {
     }
     
     func generateToken() throws {
+        
         let JWTheaders = JWTHeader(alg: "ES256", cty: nil, crit: nil, kid: keyId)
         let payload = APNSJWTPayload(iss: teamId)
         
