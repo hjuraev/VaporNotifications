@@ -13,7 +13,11 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "3.0.3"),
-        .package(url: "https://github.com/vapor/jwt.git", .upToNextMajor(from: "3.0.0-rc.2")),
+        .package(url: "https://github.com/vapor/jwt.git", .upToNextMajor(from: "3.0.0")),
+        .package(url: "https://github.com/apple/swift-nio-http2", .branch("master")),
+        .package(url: "https://github.com/apple/swift-nio.git", from: "1.10.0"),
+        .package(url: "https://github.com/MihaelIsaev/FCM.git", from: "0.6.2")
+
 
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
@@ -23,6 +27,6 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "VaporNotifications",
-            dependencies: ["JWT", "Vapor"]),
+            dependencies: ["JWT", "Vapor", "NIO","NIOHTTP2", "FCM"]),
     ]
 )

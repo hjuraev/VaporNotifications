@@ -7,6 +7,7 @@
 
 import Foundation
 import JWT
+import Vapor
 
 public class APNSProfile {
     public enum Port: Int {
@@ -22,39 +23,28 @@ public class APNSProfile {
     var privateKey: Data
     var publicKey: Data
     
-    public var keyPath: String
     public var debugLogging: Bool = false
 
     public var description: String {
         return """
         Topic \(topic)
         \nPort \(port.rawValue)
-        \nCER - Key path: \(keyPath)
+        \nTeamID \(teamId)
+        \nKeyID \(keyId)
+        \nToken \(Token ?? "")
         \nTOK - Key ID: \(String(describing: keyId))
         """
     }
-    
-    
-    public init(topic: String, teamId: String, keyId: String, keyPath: String, debugLogging: Bool = false, dev: Bool = false) throws {
-        
+    init(teamId: String, topic: String, keyId: String, publicKey: String, privateKey: String, container: Container) throws {
         self.teamId = teamId
         self.topic = topic
         self.keyId = keyId
-        self.debugLogging = debugLogging
-        self.keyPath = keyPath
-        
-        //// GENERATING TOKEN
-        
-        let fileManager = FileManager.default
-        guard fileManager.fileExists(atPath: keyPath) else {
-            throw InitializeError.keyFileDoesNotExist
-        }
-        
-        let (priv, pub) = KeyUtilities.generateKeys(Path: keyPath)
+        let (priv, pub) = try KeyUtilities.generateKeys(Path: privateKey, container: container)
         self.publicKey = pub
         self.privateKey = priv
         try generateToken()
     }
+
     
     func generateToken() throws {
         
@@ -63,7 +53,7 @@ public class APNSProfile {
         
         let signer = JWTSigner.es256(key: privateKey)
         
-        var jwt = JWT(header: JWTheaders, payload: payload)
+        let jwt = JWT(header: JWTheaders, payload: payload)
         
         let signed = try jwt.sign(using: signer)
         let stringToken = String(bytes: signed, encoding: .utf8)

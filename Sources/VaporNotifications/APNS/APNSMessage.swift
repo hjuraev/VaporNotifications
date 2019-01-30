@@ -22,7 +22,7 @@ public struct ApplePushMessage {
     
     public var threadIdentifier: String?
     
-    public var expirationDate: Date?
+    public var expirationDate: Int?
 
     public let priority: Priority
 
@@ -31,6 +31,7 @@ public struct ApplePushMessage {
         case immediately = 10
     }
     
+
     /// APNS Payload
     public let payload: APNSPayload
     
@@ -42,7 +43,7 @@ public struct ApplePushMessage {
         
         headers.add(name: HTTPHeaderName("apns-id"), value: messageId)
         if expirationDate != nil {
-            headers.add(name: HTTPHeaderName("apns-expiration"), value: String(expirationDate?.timeIntervalSince1970.rounded() ?? 0.0))
+            headers.add(name: HTTPHeaderName("apns-expiration"), value: "3600")
         }
         headers.add(name: HTTPHeaderName("apns-priority"), value: "\(priority.rawValue)")
         headers.add(name: HTTPHeaderName("apns-topic"), value: profile.topic)
@@ -59,19 +60,16 @@ public struct ApplePushMessage {
         }
         
         headers.add(name: HTTPHeaderName("authorization"), value: "bearer \(profile.Token ?? "")")
+        debugPrint(headers)
         return headers
     }
     
-    func getRequest(container: Container) -> Request {
-        let request = Request(using: container)
-        for header in getHeaders() {
-            request.http.headers.add(name: header.name, value: header.value)
+    func getRequest() -> HTTPRequest {
+        var request = HTTPRequest(method: .POST, url: hostURL(token: deviceToken), version: .init(major: 2, minor: 0), headers: getHeaders())
+
+        if let body = payload.body {
+            request.body = HTTPBody(string: body)
         }
-        request.http.method = .POST
-        request.http.url = hostURL(token: deviceToken)
-        
-        let body = HTTPBody(string: payload.body!)
-        request.http.body = body
 
         return request
     }
@@ -87,10 +85,10 @@ public struct ApplePushMessage {
     
     public func hostURL(token:String) -> URL {
         if dev {
-            let url = URL(string: "https://api.development.push.apple.com/3/device/\(deviceToken)")
+            let url = URL(string: "/3/device/\(deviceToken)")
             return url!
         } else {
-            let url = URL(string: "https://api.push.apple.com/3/device/\(deviceToken)")
+            let url = URL(string: "/3/device/\(deviceToken)")
             return url!
         }
     }
@@ -100,11 +98,13 @@ public struct ApplePushMessage {
 
 
 struct APNSJWTPayload: JWTPayload {
+    func verify(using signer: JWTSigner) throws {
+    }
+    
     let iss: String
     let iat = IssuedAtClaim(value: Date())
     let exp = ExpirationClaim(value: Date(timeInterval: 3500, since: Date()))
-    func verify() throws {
-    }
+
 }
 
 

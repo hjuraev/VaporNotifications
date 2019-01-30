@@ -15,19 +15,26 @@ import Vapor
 
 class KeyUtilities {
     
-    static func generateKeys(Path: String) -> (Data, Data){
+    
+    
+    static func generateKeys(Path: String, container: Container) throws -> (Data, Data){
         var pKey = EVP_PKEY_new()
-
-        let fp = fopen(Path, "r")
         
+        let dir = try container.make(DirectoryConfig.self)
+        
+        let workingDir = dir.workDir + "/temp"
+        let fileURL = URL(fileURLWithPath: workingDir)
+        try Path.write(to: fileURL, atomically: true, encoding: .utf8)
+        
+        let fp = fopen(workingDir, "r")
+
         PEM_read_PrivateKey(fp, &pKey, nil, nil)
- 
         let ecKey = EVP_PKEY_get1_EC_KEY(pKey)
         
         
         EC_KEY_set_conv_form(ecKey, POINT_CONVERSION_UNCOMPRESSED)
         fclose(fp)
-
+        
         var pub: UnsafeMutablePointer<UInt8>? = nil
         let pub_len = i2o_ECPublicKey(ecKey, &pub)
         var publicKey = ""
@@ -59,7 +66,7 @@ class KeyUtilities {
         let regex = try! NSRegularExpression(pattern: "[0-9a-f]{1,2}", options: .caseInsensitive)
         regex.enumerateMatches(in: key, options: [], range: NSMakeRange(0, key.count)) { match, flags, stop in
             let range = key.range(from: match!.range)
-
+            
             let byteString = key[range!]
             var num = UInt8(byteString, radix: 16)
             data.append(&num!, count: 1)
@@ -112,8 +119,8 @@ public final class ES256: ECDSASigner {
         }
         return true
     }
-
-   
+    
+    
     
     
     public let curve = NID_X9_62_prime256v1
@@ -183,7 +190,7 @@ fileprivate extension ECDSASigner {
         }
     }
     
-
+    
 }
 
 enum JWTErrors: Error {
@@ -209,13 +216,13 @@ extension JWTSigner {
     public static func es256(key: Data) -> JWTSigner {
         return JWTSigner(algorithm: ES256(key: key))
     }
-
+    
 }
 
 
 extension JWT {
     
-  
+    
 }
 
 extension String {

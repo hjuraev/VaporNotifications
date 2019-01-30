@@ -8,50 +8,50 @@
 import Foundation
 
 public struct FirebaseMessageResult: Codable {
-    public let multicast_id: Int
-    public let success: Int
-    public let failure: Int
-    public let canonical_ids: Int
-    public let results: [Result]
-    public var result: MessageResult {
-        get {
-            print(success)
-            if success == 1 {
-                return .SUCCESS
-            } else {
-                return .FAILED
-            }
+    let name: String?
+    let error: FireBaseResponseError?
+    
+    var result: Bool {
+        if error == nil {
+            return true
         }
+        return false
     }
     
-    public enum MessageResult {
-        case SUCCESS
-        case FAILED
+    init(name: String? = nil, error: FireBaseResponseError = FireBaseResponseError()) {
+        self.name = name
+        self.error = error
     }
 }
 
-public struct Result: Codable {
-    public let error: FirebaseMessageError?
-    public let message_id: String?
-    public let canonical_ids: String?
+
+struct FireBaseResponseError: Codable {
+    let code: Int?
+    let message: String?
+    let status: String?
+    let details: [FireBaseErrorDetails]?
+    
+    init() {
+        self.details = nil
+        self.status = nil
+        self.code = nil
+        self.message = nil
+    }
 }
+
+
+struct FireBaseErrorDetails: Codable {
+    let errorCode: FirebaseMessageError?
+}
+
 public enum FirebaseMessageError: String, Codable {
-    case missingRegistration = "MissingRegistration"
-    case invalidRegistration = "InvalidRegistration"
-    case notRegistered = "NotRegistered"
-    case invalidPackageName = "InvalidPackageName"
-    case authenticationError = "authenticationError"
-    case mismatchSenderId = "MismatchSenderId"
-    case invalidJson = "invalidJson"
-    case invalidParameters = "invalidParameters"
-    case messageToBig = "MessageTooBig"
-    case invalidDataKey = "InvalidDataKey"
-    case invalidTtl = "InvalidTtl"
-    case unavailable = "Unavailable"
-    case internalServerError = "InternalServerError"
-    case requestTimeout = "requestTimeout"
-    case deviceMessageRateExceeded = "DeviceMessageRateExceeded"
-    case topicMessageRateExceeded = "TopicsMessageRateExceeded"
-    case invalidApnsCredential = "InvalidApnsCredential"
+    case unknownError = "UNSPECIFIED_ERROR"
+    case invalidArguments = "INVALID_ARGUMENT"
+    case unRegistered = "UNREGISTERED"
+    case senderIDMismatch = "SENDER_ID_MISMATCH"
+    case quotaExceeded = "QUOTA_EXCEEDED"
+    case apnsAuthError = "APNS_AUTH_ERROR"
+    case unavailable = "UNAVAILABLE"
+    case internalError = "INTERNAL"
 }
 
